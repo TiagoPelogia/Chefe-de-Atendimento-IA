@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from routes.pacientes import router as pacientes_router
+
+from core.database import Base, engine
+
+# Importa o model para que ele seja registrado
+from models.paciente import Paciente
 
 app = FastAPI()
 
-app.include_router(pacientes_router)
-
-@app.get("/")
-def inicio():
-    return {"mensagem": "Chefe de Atendimento Online 🚀"}
+Base.metadata.create_all(bind=engine)
