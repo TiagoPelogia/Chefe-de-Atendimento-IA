@@ -5,7 +5,6 @@ app = FastAPI()
 
 app.include_router(pacientes_router)
 
-
 @app.get("/")
 def inicio():
     return {"mensagem": "Chefe de Atendimento Online 🚀"}
