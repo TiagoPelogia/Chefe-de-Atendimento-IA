@@ -16,40 +16,55 @@ def listar_pacientes():
 @router.post("/pacientes")
 def criar_paciente(paciente: Paciente):
 
-    pacientes.append(paciente)
+    novo_paciente = {
+        "id": len(pacientes) + 1,
+        "nome": paciente.nome,
+        "telefone": paciente.telefone,
+        "idade": paciente.idade
+    }
 
-    return paciente
+    pacientes.append(novo_paciente)
+
+    return novo_paciente
 
 
 # BUSCAR POR ID
 @router.get("/pacientes/{id}")
 def buscar_paciente(id: int):
 
-    if id < 0 or id >= len(pacientes):
-        return {"erro": "Paciente não encontrado"}
+    for paciente in pacientes:
+        if paciente["id"] == id:
+            return paciente
 
-    return pacientes[id]
+    return {"erro": "Paciente não encontrado"}
 
 
 # ATUALIZAR
 @router.put("/pacientes/{id}")
 def atualizar_paciente(id: int, paciente: Paciente):
 
-    if id < 0 or id >= len(pacientes):
-        return {"erro": "Paciente não encontrado"}
+    for p in pacientes:
 
-    pacientes[id] = paciente
+        if p["id"] == id:
 
-    return paciente
+            p["nome"] = paciente.nome
+            p["telefone"] = paciente.telefone
+            p["idade"] = paciente.idade
 
+            return p
+
+    return {"erro": "Paciente não encontrado"}
 
 # DELETAR
 @router.delete("/pacientes/{id}")
 def deletar_paciente(id: int):
 
-    if id < 0 or id >= len(pacientes):
-        return {"erro": "Paciente não encontrado"}
+    for paciente in pacientes:
 
-    pacientes.pop(id)
+        if paciente["id"] == id:
 
-    return {"mensagem": "Paciente removido"}
+            pacientes.remove(paciente)
+
+            return {"mensagem": "Paciente removido"}
+
+    return {"erro": "Paciente não encontrado"}
