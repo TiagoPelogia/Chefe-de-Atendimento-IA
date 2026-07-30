@@ -1,70 +1,90 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from core.database import get_db
+from repositories.paciente_repository import PacienteRepository
 from schemas.pacientes import Paciente
 
 router = APIRouter()
 
-pacientes = []
-
 
 # LISTAR TODOS
 @router.get("/pacientes")
-def listar_pacientes():
-    return pacientes
+def listar_pacientes(
+    db: Session = Depends(get_db)
+):
+
+    repo = PacienteRepository(db)
+
+    return repo.listar()
 
 
 # CRIAR
 @router.post("/pacientes")
-def criar_paciente(paciente: Paciente):
+def criar_paciente(
+    paciente: Paciente,
+    db: Session = Depends(get_db)
+):
 
-    novo_paciente = {
-        "id": len(pacientes) + 1,
-        "nome": paciente.nome,
-        "telefone": paciente.telefone,
-        "idade": paciente.idade
-    }
+    repo = PacienteRepository(db)
 
-    pacientes.append(novo_paciente)
-
-    return novo_paciente
-
+    return repo.criar(
+        nome=paciente.nome,
+        telefone=paciente.telefone,
+        idade=paciente.idade
+    )
 
 # BUSCAR POR ID
 @router.get("/pacientes/{id}")
-def buscar_paciente(id: int):
+def buscar_paciente(
+    id: int,
+    db: Session = Depends(get_db)
+):
 
-    for paciente in pacientes:
-        if paciente["id"] == id:
-            return paciente
+    repo = PacienteRepository(db)
 
-    return {"erro": "Paciente não encontrado"}
+    paciente = repo.buscar_por_id(id)
+
+    if paciente is None:
+        return {"erro": "Paciente não encontrado"}
+
+    return paciente
 
 
 # ATUALIZAR
 @router.put("/pacientes/{id}")
-def atualizar_paciente(id: int, paciente: Paciente):
+def atualizar_paciente(
+    id: int,
+    paciente: Paciente,
+    db: Session = Depends(get_db)
+):
 
-    for p in pacientes:
+    repo = PacienteRepository(db)
 
-        if p["id"] == id:
+    atualizado = repo.atualizar(
+        paciente_id=id,
+        nome=paciente.nome,
+        telefone=paciente.telefone,
+        idade=paciente.idade
+    )
 
-            p["nome"] = paciente.nome
-            p["telefone"] = paciente.telefone
-            p["idade"] = paciente.idade
+    if atualizado is None:
+        return {"erro": "Paciente não encontrado"}
 
-            return p
-
-    return {"erro": "Paciente não encontrado"}
+    return atualizado
 
 # DELETAR
 @router.delete("/pacientes/{id}")
-def deletar_paciente(id: int):
+def deletar_paciente(
+    id: int,
+    db: Session = Depends(get_db)
+):
 
-    for paciente in pacientes:
+    repo = PacienteRepository(db)
 
-        if paciente["id"] == id:
+    removido = repo.deletar(id)
 
-            pacientes.remove(paciente)
+    if not removido:
+        return {"erro": "Paciente não encontrado"}
 
-            return {"mensagem": "Paciente removido"}
-
-    return {"erro": "Paciente não encontrado"}
+    return {"mensagem": "Paciente removido"}

@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 
 from core.database import Base, engine
-
-# Importa o model para que ele seja registrado
 from models.paciente import Paciente
+
+from routes import pacientes
 
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
+
+app.include_router(pacientes.router)

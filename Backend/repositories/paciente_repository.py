@@ -49,3 +49,32 @@ class PacienteRepository:
             .first()
 
         )
+
+def atualizar(self, paciente_id, nome, telefone, idade):
+
+    paciente = self.buscar_por_id(paciente_id)
+
+    if not paciente:
+        return None
+
+    paciente.nome = nome
+    paciente.telefone = telefone
+    paciente.idade = idade
+
+    self.db.commit()
+    self.db.refresh(paciente)
+
+    return paciente
+
+def deletar(self, paciente_id):
+
+    paciente = self.buscar_por_id(paciente_id)
+
+    if not paciente:
+        return False
+
+    self.db.delete(paciente)
+
+    self.db.commit()
+
+    return True
