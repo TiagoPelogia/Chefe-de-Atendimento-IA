@@ -1,29 +1,29 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-DATABASE_URL = "postgresql://postgres:246812@localhost:5432/chefe_atendimento"
+from core.config import settings
+
 
 engine = create_engine(
-    DATABASE_URL,
-    echo=True
+    settings.database_url,
+    echo=settings.sql_echo,
+    pool_pre_ping=True,
 )
 
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
-    bind=engine
+    bind=engine,
 )
 
 
 class Base(DeclarativeBase):
     pass
 
+
 def get_db():
-
     db = SessionLocal()
-
     try:
         yield db
-
     finally:
         db.close()
