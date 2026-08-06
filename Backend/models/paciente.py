@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, Integer
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 from core.database import Base
 
@@ -27,4 +29,11 @@ class Paciente(Base):
     idade: Mapped[int] = mapped_column(
         Integer,
         nullable=False
+
+    clinica_id: Mapped[int] = mapped_column(
+    ForeignKey("clinicas.id"),
+    nullable=False
+)
     )
+
+clinica = relationship("Clinica")
