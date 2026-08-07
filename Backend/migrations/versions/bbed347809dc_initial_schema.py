@@ -34,10 +34,63 @@ def upgrade() -> None:
     sa.UniqueConstraint('cnpj'),
     sa.UniqueConstraint('email')
     )
-    op.add_column('pacientes', sa.Column('clinica_id', sa.Integer(), nullable=False))
-    op.create_index(op.f('ix_pacientes_clinica_id'), 'pacientes', ['clinica_id'], unique=False)
-    op.create_foreign_key(None, 'pacientes', 'clinicas', ['clinica_id'], ['id'], ondelete='RESTRICT')
-    # ### end Alembic commands ###
+    op.add_column(
+        "pacientes",
+        sa.Column("clinica_id", sa.Integer(), nullable=True),
+    )
+
+    connection = op.get_bind()
+
+    clinica_inicial_id = connection.execute(
+        sa.text(
+            """
+            INSERT INTO clinicas (nome, cnpj, telefone, email, plano, status)
+            VALUES (
+                'Clinica Inicial',
+                '00000000000000',
+                '0000000000',
+                'admin@clinica.local',
+                'starter',
+                'ativo'
+            )
+            RETURNING id
+            """
+        )
+    ).scalar_one()
+
+    connection.execute(
+        sa.text(
+            """
+            UPDATE pacientes
+            SET clinica_id = :clinica_id
+            WHERE clinica_id IS NULL
+            """
+        ),
+        {"clinica_id": clinica_inicial_id},
+    )
+
+    op.alter_column(
+        "pacientes",
+        "clinica_id",
+        existing_type=sa.Integer(),
+        nullable=False,
+    )
+
+    op.create_index(
+        op.f("ix_pacientes_clinica_id"),
+        "pacientes",
+        ["clinica_id"],
+        unique=False,
+    )
+
+    op.create_foreign_key(
+        None,
+        "pacientes",
+        "clinicas",
+        ["clinica_id"],
+        ["id"],
+        ondelete="RESTRICT",
+    )
 
 
 def downgrade() -> None:
