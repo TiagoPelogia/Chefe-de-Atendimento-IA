@@ -6,6 +6,7 @@ from pwdlib import PasswordHash
 from core.config import settings
 
 password_hash = PasswordHash.recommended()
+DUMMY_PASSWORD_HASH = password_hash.hash("timing-attack-dummy")
 
 
 def hash_password(password: str) -> str:
