@@ -8,6 +8,8 @@ from core.database import Base
 
 if TYPE_CHECKING:
     from models.paciente import Paciente
+    from models.profissional import Profissional
+    from models.usuario import Usuario
 
 
 class Clinica(Base):
@@ -31,3 +33,9 @@ class Clinica(Base):
     pacientes: Mapped[list["Paciente"]] = relationship(
         back_populates="clinica"
     )
+    profissionais: Mapped[list["Profissional"]] = relationship(
+        back_populates="clinica"
+    )
+    usuarios: Mapped[list["Usuario"]] = relationship(
+    back_populates="clinica"
+)

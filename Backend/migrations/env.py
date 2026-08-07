@@ -23,6 +23,8 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 from models.paciente import Paciente
 from models.clinica import Clinica
+from models.profissional import Profissional
+from models.usuario import Usuario
 from core.database import Base
 
 target_metadata = Base.metadata
